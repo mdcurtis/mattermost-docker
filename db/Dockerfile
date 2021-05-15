@@ -1,23 +1,21 @@
-FROM postgres:9.4-alpine
+FROM postgres:13
 
 ENV DEFAULT_TIMEZONE UTC
 
 # Install some packages to use WAL
 RUN echo "azure<5.0.0" > pip-constraints.txt
-RUN apk add --no-cache \
-      build-base \
+RUN  apt-get update \
+  && apt-get install -y \
+      build-essential \
       curl \
-      libc6-compat \
       libffi-dev \
-      linux-headers \
-      python-dev \
-      py-pip \
-      py-cryptography \
+      python3-dev \
+      python3-pip \
+      python3-cryptography \
       pv \
-      libressl-dev \
-    && pip install --upgrade pip \
-    && pip --no-cache-dir install -c pip-constraints.txt 'wal-e<1.0.0' envdir \
-    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+  && pip3 install --upgrade pip \
+  && pip3 install --upgrade wheel \
+  && pip3 --no-cache-dir install -c pip-constraints.txt 'wal-e<1.0.0' envdir
 
 # Add wale script
 COPY setup-wale.sh /docker-entrypoint-initdb.d/
